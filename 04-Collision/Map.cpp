@@ -103,6 +103,8 @@ void CMap::DrawMap()
 		for (int i = (int)cam_x / TILE_SIZE; i <= (int)(cam_x + SCREEN_WIDTH) / BRICK_SIZE; i++)
 			CSprites::GetInstance()->Get(9999)->Draw(i * BRICK_SIZE, 360);
 	}
+	CSprites::GetInstance()->Get(1000000)->Draw(0,0);
+
 }
 
 

@@ -125,6 +125,13 @@
     <sprite id="60012" left="277" top="77" right="289" bottom="96"/>
     <sprite id="60013" left="300" top="77" right="311" bottom="96"/>
     <sprite id="70001" left="19" top="1238" right="537" bottom="1686"/>
+    <sprite id="1000000" left="1661" top="27" right="2675" bottom="1205"/>
+    <sprite id="1000001" left="1678" top="1292" right="1723" bottom="1352"/>
+    <sprite id="1000002" left="1743" top="1292" right="1788" bottom="1351"/>
+    <sprite id="1000003" left="1810" top="1292" right="1855" bottom="1350"/> 
+    <sprite id="1000011" left="1879" top="1291" right="1920" bottom="1350"/>
+    <sprite id="1000012" left="1943" top="1291" right="1982" bottom="1350"/>
+    <sprite id="1000013" left="2009" top="1291" right="2047" bottom="1350"/>
   </Texture>
 
 

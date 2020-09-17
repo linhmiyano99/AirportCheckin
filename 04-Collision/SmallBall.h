@@ -6,7 +6,7 @@
 #include "GameObject.h"
 #include "Textures.h"
 
-#define SMALLBALL_HEIGHT 12
+#define SMALLBALL_12
 #define SMALLBALL_WIDTH 12
 
 #define SMALLBALL_NOT_EXSIST 0

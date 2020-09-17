@@ -229,7 +229,6 @@ void CSimon::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			CScene::GetInstance()->GoInside();
 			CScene::GetInstance()->SetMap(1);
 			CScene::GetInstance()->LoadResoure();
-			CScene::GetInstance()->LoadSimon();
 		}
 		return;
 	}

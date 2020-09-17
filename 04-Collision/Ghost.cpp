@@ -1,4 +1,4 @@
-#include"Ghost.h"
+﻿#include"Ghost.h"
 #include"Scene.h"
 #include"HidenObject.h"
 #include"Torch.h"
@@ -8,23 +8,19 @@ bool CGhost::isStart = false;
 CGhost::CGhost(float _x, float _y, int id) :CEnemy(_x, _y, id, eType::GHOST)
 {
 	animations.clear();
-	AddAnimation(1000);
+	int _type; // kiểu bay > thẳng hoặc lượn
+	srand((unsigned)time(0));
+	_type = rand() % 2;
+
+	if(_type == 1)
+		AddAnimation(1300);
+	else
+		AddAnimation(1301);
 	AddAnimation(800);
 	AddAnimation(802);
 	nx = -1;
 	SetSpeed(GetTrend() * GHOST_SPEED, 0);
 	dt_appear = 0;
-	if (x > 4000)
-	{
-		_leftLimit = SCENCE_4_LEFT;
-		_rightLimit = SCENCE_4_RIGHT - SCREEN_WIDTH * 3 / 2;
-	}
-	else
-	{
-		_leftLimit = SCENCE_1_LEFT;
-		_rightLimit = SCENCE_1_RIGHT - GHOST_BBOX_WIDTH;
-	}
-
 }
 void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
@@ -32,16 +28,10 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		return;
 	float cam_x, cam_y;
 	CGame::GetInstance()->GetCamPos(cam_x, cam_y);
-	if (CScene::GetInstance()->IsKillAllEnemy() && x > cam_x&& x < cam_x + SCREEN_WIDTH)
-	{
-		Dead();
-	}
 	
 	if (dt_appear > 0)
 	{
 		
-		if (start_x > cam_x + SCREEN_WIDTH + GHOST_DISTANCE_TOO_FAR || start_x < cam_x - GHOST_DISTANCE_TOO_FAR)
-			return;
 		if (GetTickCount() - dt_appear > TIME_APPEAR && (start_x > cam_x + SCREEN_WIDTH ) || (start_x < cam_x ) )
 		{
 		
@@ -72,33 +62,17 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			float _x, _y;
 			CSimon::GetInstance()->GetPosition(_x, _y);
-			if ((x < _leftLimit && nx < 0) || (x > _rightLimit && nx > 0))
-			{
-				nx = -nx;
-				vx = -vx;
-			}
-
-			if (x < cam_x - GHOST_DISTANCE_TOO_FAR || x > cam_x + SCREEN_WIDTH + GHOST_DISTANCE_TOO_FAR)
-			{
-				state = TORCH_STATE_ITEM_NOT_EXSIST;
-				dt_appear = GetTickCount();
-			}
 			vector<LPGAMEOBJECT> list;
 			for (int i = 0; i < coObjects->size(); i++)
 			{
-
-				if (dynamic_cast<CBrick*>(coObjects->at(i)))
+				if (dynamic_cast<CHidenObject*>(coObjects->at(i)))
 				{
-					list.push_back(coObjects->at(i));
-				}
-				else if (dynamic_cast<CHidenObject*>(coObjects->at(i)))
-				{
-					if(coObjects->at(i)->GetState() == eType::OBJECT_HIDDEN_GHOST_2 )
+					if(coObjects->at(i)->GetState() == eType::OBJECT_HIDDEN_GHOST_UP )
 					list.push_back(coObjects->at(i));
 				}
 			}
 
-			vy += SIMON_GRAVITY * dt;
+			vy = -GHOST_SPEED * dt;
 
 			CGameObject::Update(dt);
 
@@ -124,10 +98,6 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				for (UINT i = 0; i < coEventsResult.size(); i++)
 				{
 					LPCOLLISIONEVENT e = coEventsResult[i];
-					if (dynamic_cast<CBrick*>(e->obj))
-					{
-						CollisionWithBrick(dt, e->obj, min_tx, min_ty, nx, ny_1);
-					}
 					if (dynamic_cast<CHidenObject*>(e->obj))
 					{
 						CollisionWithHiden(dt, e->obj, min_tx, min_ty, nx, ny_1);
@@ -277,18 +247,11 @@ void CGhost::CollisionWithHiden(DWORD dt, LPGAMEOBJECT& obj, float min_tx0, floa
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 	CHidenObject* ohiden = dynamic_cast<CHidenObject*>(obj);
-	if (ohiden->GetState() == eType::OBJECT_HIDDEN_GHOST_2)
+	if (ohiden->GetState() == eType::OBJECT_HIDDEN_GHOST_UP)
 	{
-		vx = 0;
-		vy = GHOST_SPEED * 2;
-		y += vy * dt;
-		x += vx * dt;
+		Dead();
 	}
-	else
-	{
-		x += vx * dt;
 
-	}
 
 	ohiden = NULL;
 	list.clear();

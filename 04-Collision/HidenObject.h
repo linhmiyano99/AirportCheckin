@@ -54,6 +54,8 @@ public:
 			break;
 
 		default:
+			_height = 30;
+			_width = 30;
 			break;
 		}
 

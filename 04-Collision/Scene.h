@@ -41,7 +41,6 @@
 class CScene
 {
 	static CScene* __instance;
-	CSimon* simon;
 	CBoss* boss;
 	CMap* map;
 	CDagger* dagger;
@@ -50,7 +49,6 @@ class CScene
 	CBoongmerang* boongmerang;
 	CGame* game;
 	CHidenObject* hiden;
-	CBoard* board;
 	CGrid* grid;
 	//Sound* sound;
 	CSprites* sprites;
@@ -68,7 +66,6 @@ public:
 	static CScene* GetInstance();
 	CScene(int id = 0);
 	void LoadResoure();
-	void LoadSimon();
 	void Update(DWORD dt);
 	void Render();
 	void SetMap(int id = 0);

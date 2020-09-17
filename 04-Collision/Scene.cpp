@@ -16,7 +16,6 @@ CScene::CScene(int id)
 	this->id = id;
 	map = CMap::GetInstance();
 	game = CGame::GetInstance();
-	board = CBoard::GetInstance();
 	grid = CGrid::GetInstance();
 	isAutoTran = false;
 	auto_tran = 0;
@@ -25,76 +24,30 @@ CScene::CScene(int id)
 	Sound::GetInstance()->Play(eSound::musicStage1);
 	CManagementTexture* manage = new CManagementTexture();
 	SAFE_DELETE(manage);
+	CGhost::Start();
 }
 
 
 void CScene::LoadResoure()
 {
 	if (id == 0) {
-		map->SetMap(0);
+		CSprites::GetInstance()->Get(1000000)->Draw(0, 0);
 		grid->LoadObject("texture/objects_1.txt");
-		simon = CSimon::GetInstance();
 	}
 	else
 	{
-		map->SetMap(1);
+		CSprites::GetInstance()->Get(1000000)->Draw(0, 0);
 		isOutSide = false;
 		grid->LoadObject("texture/objects_2.txt");
 
 	}
 }
 		
-void CScene::LoadSimon()
-{
-	float simon_x, simon_y;
-	simon->GetPosition(simon_x, simon_y);
-	smallballs.clear();
-	if (id == 1)
-	{
-		simon->SetPosition(SIMON_POSITION_0);
-	}
-	else if (id == 2)
-	{
-		if (simon_y < SIMON_Y_UPPER)
-			simon->SetPosition(simon_x, simon_y);
-		else
-			simon->SetUnder();
-	}
-	else if (id == 3)
-	{
-		simon->SetUnder();
-	}
-
-}
 
 void CScene::Update(DWORD dt)
 {
 	game->GetCamPos(cam_x, cam_y);
-	if (board->IsStop())
-	{
-		if (simon->IsFall(dt))
-			return;
-		if (simon->GetEnergy() < SIMON_MAX_ENERGY)
-		{
-			simon->UpEnergy();
-			return;
-		}
-		else if (board->GetTime() > 0)
-		{
-			Sound::GetInstance()->Play(eSound::soundGetScoreTimer);
-			board->TimeDown();
-			return;
-		}
-		else if (simon->GetHeart() > 0)
-		{
-			Sound::GetInstance()->Play(eSound::soundGetScoreHeart);
-			simon->HeartDown();
-			return;
-		}
-		Sound::GetInstance()->Stop(eSound::music_Boss);
-		return;
-
-	}	
+	
 	if (start_killAllEnemy > 0)
 	{
 		if (GetTickCount() - start_killAllEnemy > TIME_KILL_ALL_ENEMY)
@@ -118,7 +71,6 @@ void CScene::Update(DWORD dt)
 		}
 	}
 
-	board->Update(dt);
 	for each (LPGAMEOBJECT var in smallballs)
 	{
 		var->Update(dt);
@@ -128,17 +80,14 @@ void CScene::Update(DWORD dt)
 
 	if (isAutoTran)
 	{
-		if (simon->IsFall(dt))
-			return;
+		
 		if (cam_x < auto_tran)
 		{
 			if (cam_x < auto_tran - SCREEN_WIDTH / 2)
 				game->SetCamPos(cam_x + 2.0f, cam_y);// vận tốc chuyển màn 2.0f pixcel / milisecond 
 			else
 			{
-				if (simon->IsAutoGo())
-					simon->Update(dt);
-				else
+			
 					game->SetCamPos(cam_x + 2.0f, cam_y);// vận tốc chuyển màn 2.0f pixcel / milisecond 
 			}
 
@@ -147,10 +96,8 @@ void CScene::Update(DWORD dt)
 		{
 			_stage++;
 			id = GetStartScene();
-			simon->SetStart(GetLeft(), GetSimonStartHeight());
 			isAutoTran = false;
 			
-			simon->SetTrend(1);
 			CGate::Stop();
 		}
 	}
@@ -162,49 +109,12 @@ void CScene::Update(DWORD dt)
 			Sound::GetInstance()->Play(eSound::music_Boss);
 		}
 		float cx, cy;
-		simon->GetPosition(cx, cy);
 		game->GetCamPos(cam_x, cam_y);
 		grid->GetListObject(objects, cam_x, cam_y);
 
-
-		if (cy >= CAM_Y_DOWN && id != 3)
-		{
-			id = 3;
-			SetMap(3);
-			LoadSimon();
-			cy = CAM_Y_DOWN;
-		}
-		else if (id == 3)
-		{
-			if (cy < CAM_Y_DOWN)
-			{
-				if (simon->IsOnStair())
-				{
-					id = 2;
-					SetMap(2);
-					LoadSimon();
-					cy = 0;
-				}
-				else
-					cy = CAM_Y_DOWN;
-
-			}
-			else
-				cy = CAM_Y_DOWN;
-		}
-		else if (id == 4 && cx > POSITION_START_BOSS)
-		{
-			id = 5;
-			CBoss::GetInstance()->SetState(BOSS_STATE_FLY);
-		}
-		else
-		{
-			cy = 0;
-		}
-
 		
 		// Update camera to follow simon
-		cx -= SCREEN_WIDTH / 2 - 40;
+		cx = SCREEN_WIDTH / 2 - 40;
 		//cy -= SCREEN_HEIGHT / 2 + 40;
 
 		vector<LPGAMEOBJECT> coObjects;
@@ -217,7 +127,6 @@ void CScene::Update(DWORD dt)
 		{
 			objects[i]->Update(dt, &coObjects);
 		}
-		simon->Update(dt, &coObjects);
 
 
 		if (cx < GetLeft())
@@ -227,25 +136,7 @@ void CScene::Update(DWORD dt)
 			if (cx > GetRight() - SCREEN_WIDTH)
 				cx = GetRight() - SCREEN_WIDTH;
 		}
-		if(!(IsOutSide() && cx > GetRight() - SCREEN_WIDTH))
-			game->SetCamPos(cx, cy);
-		switch (CBoard::GetInstance()->GetWeapon())
-		{
-		case  eType::DAGGER:
-			CDagger::GetInstance()->Update(dt, &coObjects);
-			break;
-		case eType::ITEMAXE:
-			CAxe::GetInstance()->Update(dt, &coObjects);
-			break;
-		case eType::ITEMHOLLYWATTER:
-			CHollyWatter::GetInstance()->Update(dt, &coObjects);
-			break;
-		case eType::ITEMBOONGMERANG:
-			CBoongmerang::GetInstance()->Update(dt, &coObjects);
-			break;
-		default:
-			break;
-		}
+
 		coObjects.clear();
 
 	}
@@ -253,7 +144,7 @@ void CScene::Update(DWORD dt)
 }
 void CScene::Render() 
 {
-	map->DrawMap();
+	CSprites::GetInstance()->Get(1000000)->Draw(0, 0);
 
 	for each (LPGAMEOBJECT var in smallballs)
 	{
@@ -264,7 +155,6 @@ void CScene::Render()
 	{
 		objects[i]->Render();
 	}
-	simon->Render();
 
 	switch (CBoard::GetInstance()->GetWeapon())
 	{
@@ -284,13 +174,8 @@ void CScene::Render()
 		break;
 	}
 
-	board->Render();
 	float s_x, s_y;
-	simon->GetPosition(s_x, s_y);
-	if (simon->IsOnStair() && (s_y > START_DOWN&& s_y < DONE_DOWN) && simon->GetState() != SIMON_STATE_DIE)
-	{
-		CSprites::GetInstance()->Get(70001)->Draw(cam_x, cam_y);
-	}
+
 }
 void CScene::SetMap(int id)
 {
@@ -423,8 +308,6 @@ void CScene::TestStage(int stage)
 		break;
 	}
 	LoadResoure();
-	simon->SetPosition(GetLeft(), GetSimonStartHeight());
-	simon->SetStart(GetLeft(), GetSimonStartHeight());
 	CGate::Stop();
 }
 bool CScene::IsKillAllEnemy()
