@@ -22,5 +22,6 @@ public:
 	void Insert(int id, int grid_x, int grid_y, int type, int trend, float x, float y, float w, float h, int id_item, int object);
 	CGameObject* GetNewObject(int type, int trend, int x, int y, int w, int h, int id_item, int object);
 	void GetListObject(vector<LPGAMEOBJECT>& ListObj, float cam_x, float cam_y);
+	void addObject(int id, LPGAMEOBJECT obj);
 
 };

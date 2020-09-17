@@ -8,73 +8,65 @@ bool CGhost::isStart = false;
 CGhost::CGhost(float _x, float _y, int id) :CEnemy(_x, _y, id, eType::GHOST)
 {
 	animations.clear();
-	int _type; // kiểu bay > thẳng hoặc lượn
-	srand((unsigned)time(0));
-	_type = rand() % 2;
-
-	if(_type == 1)
-		AddAnimation(1300);
-	else
-		AddAnimation(1301);
-	AddAnimation(800);
-	AddAnimation(802);
+	AddAnimation(1300);
+	AddAnimation(1301);
+	AddAnimation(1302);
+	AddAnimation(1310);
+	AddAnimation(1311);
+	AddAnimation(1312);
 	nx = -1;
-	SetSpeed(GetTrend() * GHOST_SPEED, 0);
+	SetSpeed(0, 0);
 	dt_appear = 0;
+	hang = id;
+	hang_checkin = id;
+	vx = 1;
 }
 void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (!CGhost::IsStart())
 		return;
-	float cam_x, cam_y;
-	CGame::GetInstance()->GetCamPos(cam_x, cam_y);
-	
 	if (dt_appear > 0)
 	{
-		
-		if (GetTickCount() - dt_appear > TIME_APPEAR && (start_x > cam_x + SCREEN_WIDTH ) || (start_x < cam_x ) )
-		{
-		
-			float s_x, s_y;
-			CSimon::GetInstance()->GetPosition(s_x, s_y);
-			state = TORCH_STATE_EXSIST;
-			x = start_x;
-			y = start_y;
-			if (x > s_x)
-				nx = -1;
-			else
-				nx = 1;
-			vx = nx * GHOST_SPEED;
-
-			if (item)
-				item->SetState(ITEM_STATE_EXSIST);
-			dt_appear = 0;
-			dt_die = 0;
+		if (GetTickCount() - dt_appear > dt_check_in) {
+			Dead();
+			if (hang == 0) {
+				CScene::cusHang0Down();
+			}
+			else if (hang == 1)
+			{
+				CScene::cusHang1Down();
+			}
+			else if (hang == 2)
+			{
+				CScene::cusHang2Down();
+			}
 		}
-		else
-			return;
-	}
-	if (vx == 0 && vy == 0)
 		return;
+	}
+	if (hang_checkin == 0)
+	{
+		if (x > CHECKIN_0)
+			vx = -0.005f * dt;
+		else vx = 0;
+	}
+	else if (hang_checkin == 2) {
+		if (x < CHECKIN_2)
+			vx = 0.005f * dt;
+		else
+			vx = 0;
+	}
+	else
+		vx = 0;
 	if (dt_die == 0)
 	{
 		if (state == TORCH_STATE_EXSIST)
 		{
 			float _x, _y;
 			CSimon::GetInstance()->GetPosition(_x, _y);
-			vector<LPGAMEOBJECT> list;
-			for (int i = 0; i < coObjects->size(); i++)
-			{
-				if (dynamic_cast<CHidenObject*>(coObjects->at(i)))
-				{
-					if(coObjects->at(i)->GetState() == eType::OBJECT_HIDDEN_GHOST_UP )
-					list.push_back(coObjects->at(i));
-				}
-			}
-
 			vy = -GHOST_SPEED * dt;
-
-			CGameObject::Update(dt);
+			this->dt = dt;
+			dx = vx * dt;
+			dy = vy * dt;
 
 			// Simple fall down
 			vector<LPCOLLISIONEVENT> coEvents;
@@ -83,7 +75,7 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			coEvents.clear();
 
 
-			CalcPotentialCollisions(&list, coEvents);
+			CalcPotentialCollisions(coObjects, coEvents);
 
 			if (coEvents.size() == 0)
 			{
@@ -92,6 +84,7 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			else {
 				float min_tx, min_ty, nx = 0, ny_1;
+				vy = 0;
 
 				FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny_1);
 
@@ -102,52 +95,18 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					{
 						CollisionWithHiden(dt, e->obj, min_tx, min_ty, nx, ny_1);
 					}
+					else {
+						//y += min_ty * dy + ny * 0.4f;
+						vy = 0;
+						y += 0.4f;
+					}
 
 				}
 
 			}
-			list.clear();
 			// clean up collision events
 			for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
-		}
-		else 
-		if (state == TORCH_STATE_NOT_EXSIST) 
-		{
-			dt_die = GetTickCount();
-			if (item)
-			{
-				item->SetPosition(x, y);
-			}
-			else
-			{
-				state = TORCH_STATE_ITEM_NOT_EXSIST;
-				dt_appear = GetTickCount();
-				return;
-			}
-		}
-	}
-	else
-	{
-		if (item != NULL) {//co item
 
-			if (GetTickCount() - dt_die > TIME_ENEMY_DIE) // cho 150 mili second
-			{
-				item->Update(dt, coObjects);
-				item->GetPosition(x, y);
-				state = TORCH_STATE_ITEM;
-				if (item->GetState() == ITEM_STATE_NOT_EXSIST)
-				{
-					state = TORCH_STATE_ITEM_NOT_EXSIST;
-					dt_appear = GetTickCount();
-					return;
-				}
-			}
-		}
-		else
-		{
-			state = TORCH_STATE_ITEM_NOT_EXSIST;
-			dt_appear = GetTickCount();
-			return;
 		}
 	}
 
@@ -162,7 +121,28 @@ void CGhost::Render()
 		return;
 	if (state == TORCH_STATE_EXSIST)
 	{
-		animations[0]->Render(x, y, nx, 255);
+		if (hang == 0)
+		{
+			if(vy != 0)
+				animations[0]->Render(x, y, nx, 255);
+			else
+				animations[3]->Render(x, y, nx, 255);
+		}
+		else if(hang == 1)
+		{
+			if (vy != 0)
+				animations[1]->Render(x, y, nx, 255);
+			else
+				animations[4]->Render(x, y, nx, 255);
+		}
+		else
+		{
+			if (vy != 0)
+				animations[2]->Render(x, y, nx, 255);
+			else
+				animations[5]->Render(x, y, nx, 255);
+		}
+
 	}
 	else if (state == TORCH_STATE_ITEM)
 	{
@@ -180,7 +160,7 @@ void CGhost::Render()
 		}
 	}
 
-	//RenderBoundingBox();
+	RenderBoundingBox();
 }
 void CGhost::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
@@ -215,13 +195,7 @@ void CGhost::CollisionWithBrick(DWORD dt, LPGAMEOBJECT& obj, float min_tx0, floa
 	FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny);
 
 	//// block 
-	if (min_tx <= min_tx0)
-		x += min_tx * dx + nx * 0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
-	if (min_ty <= min_ty0)
-		y += min_ty * dy + ny * 0.4f;
-	if (ny != 0) vy = 0;
-	if (vx == 0)
-		vx = -GHOST_SPEED;
+	
 	list.clear();
 }
 
@@ -247,9 +221,21 @@ void CGhost::CollisionWithHiden(DWORD dt, LPGAMEOBJECT& obj, float min_tx0, floa
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 	CHidenObject* ohiden = dynamic_cast<CHidenObject*>(obj);
-	if (ohiden->GetState() == eType::OBJECT_HIDDEN_GHOST_UP)
+	dt_appear = GetTickCount();
+	if (ohiden->GetState() == eType::OBJECT_HIDDEN_GATE_0)
 	{
-		Dead();
+		dt_check_in = 1000 * (2 + rand() % 2);
+	
+	}
+	else if (ohiden->GetState() == eType::OBJECT_HIDDEN_GATE_1)
+	{
+		dt_check_in = 1000 * (1 + rand() % 4);
+
+	}
+	else if (ohiden->GetState() == eType::OBJECT_HIDDEN_GATE_2)
+	{
+		dt_check_in = 1000 * (3 + rand() % 5);
+
 	}
 
 

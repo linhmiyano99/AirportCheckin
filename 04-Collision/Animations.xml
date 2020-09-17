@@ -380,6 +380,31 @@
       <sprite id="40000"/>
     </Animation>
 
+    <Animation animationID="1300" frameTime="100">
+      <sprite id="1000001"/>
+      <sprite id="1000002"/>
+      <sprite id="1000003"/>
+    </Animation>
+    <Animation animationID="1301" frameTime="100">
+      <sprite id="1000011"/>
+      <sprite id="1000012"/>
+      <sprite id="1000013"/>
+    </Animation>
+    <Animation animationID="1302" frameTime="100">
+      <sprite id="1000021"/>
+      <sprite id="1000022"/>
+      <sprite id="1000023"/>
+    </Animation>
+    <Animation animationID="1310" frameTime="100">
+      <sprite id="1000002"/>
+
+    </Animation>
+    <Animation animationID="1311" frameTime="100">
+      <sprite id="1000012"/>
+    </Animation>
+    <Animation animationID="1312" frameTime="100">
+      <sprite id="1000022"/>
+    </Animation>
 </Texture>
 
 

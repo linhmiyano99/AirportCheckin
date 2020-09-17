@@ -123,5 +123,15 @@ CGameObject* CGrid::GetNewObject( int type, int trend, int x, int y, int w, int 
 		return NULL;
 	}
 }
+void CGrid::addObject(int id, LPGAMEOBJECT obj) {
+
+	if (obj == NULL)
+		return;
+	obj->SetTrend(0);
+	obj->SetID(id);
+	/*if (obj->GetType() == eType::BRICK_2)
+		listBrick.push_back(obj);*/
+	cells[0][0].push_back(obj);
+}
 
 

@@ -132,6 +132,9 @@
     <sprite id="1000011" left="1879" top="1291" right="1920" bottom="1350"/>
     <sprite id="1000012" left="1943" top="1291" right="1982" bottom="1350"/>
     <sprite id="1000013" left="2009" top="1291" right="2047" bottom="1350"/>
+    <sprite id="1000021" left="1685" top="1375" right="1721" bottom="1482"/>
+    <sprite id="1000022" left="1750" top="1375" right="1784" bottom="1482"/>
+    <sprite id="1000023" left="1814" top="1375" right="1850" bottom="1482"/>
   </Texture>
 
 

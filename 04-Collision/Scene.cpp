@@ -4,12 +4,71 @@
 
 
 CScene* CScene::__instance = NULL;
+int CScene::cus_hang0 = 0;
+int CScene::cus_hang1 = 0;
+int CScene::cus_hang2 = 0;
 static bool isKillAllEnemy = false;
 
+int CScene::cusHang0Up() 
+{
+	return ++cus_hang0;
+}
+int CScene::cusHang1Up()
+{
+	return ++cus_hang1;
+
+}
+int CScene::cusHang2Up()
+{
+	return ++cus_hang2;
+
+}
+int CScene::cusHang0Down()
+{
+	return --cus_hang0;
+
+}
+int CScene::cusHang1Down()
+{
+	return --cus_hang1;
+
+}
+int CScene::cusHang2Down()
+{
+	return --cus_hang2;
+
+}
 CScene* CScene::GetInstance()
 {
 	if (__instance == NULL) __instance = new CScene();
 	return __instance;
+}
+void CScene::setHang0(int n) {
+	__hang0 = n;
+}
+void CScene::setHang1(int n) {
+	__hang1 = n;
+}
+void CScene::setHang2(int n) {
+	__hang2 = n;
+}
+int CScene::getHang0(){
+	return __hang0;
+}
+int CScene::getHang1() {
+	return __hang1;
+}
+int CScene::getHang2(){
+	return __hang2;
+}
+int CScene::downHang0(){
+	return --__hang0;
+}
+int CScene::downHang1() {
+	return --__hang1;
+}
+int CScene::downHang2(){
+	return --__hang2;
 }
 CScene::CScene(int id)
 {
@@ -25,6 +84,10 @@ CScene::CScene(int id)
 	CManagementTexture* manage = new CManagementTexture();
 	SAFE_DELETE(manage);
 	CGhost::Start();
+	id_cus = 0;
+	__hang0 = 10;
+	__hang1 = 30;
+	__hang2 = 60;
 }
 
 
@@ -41,115 +104,56 @@ void CScene::LoadResoure()
 		grid->LoadObject("texture/objects_2.txt");
 
 	}
+	
+
 }
 		
 
 void CScene::Update(DWORD dt)
 {
-	game->GetCamPos(cam_x, cam_y);
-	
-	if (start_killAllEnemy > 0)
-	{
-		if (GetTickCount() - start_killAllEnemy > TIME_KILL_ALL_ENEMY)
-		{
-			start_killAllEnemy = 0;
-			BACKGROUND_COLOR = BACKGROUND_COLOR_DEFAULT;
-		}
-		else
-		{
-			if ((GetTickCount() - start_killAllEnemy) % 10 == 0)
-			{
-				if (BACKGROUND_COLOR == BACKGROUND_COLOR_DEFAULT)
-				{
-					BACKGROUND_COLOR = BACKGROUND_COLOR_CROSS;
-				}
-				else
-				{
-					BACKGROUND_COLOR = BACKGROUND_COLOR_DEFAULT;
-				}
+	if (GetTickCount() % 3000 == 0) {
+		if (getHang0() + getHang1() + getHang2() > 0) {
+			srand(time(NULL));
+			int res = rand() % 3;
+			if (res == 0 && getHang0() > 0) {
+				CGhost *cus = new CGhost(GATE_X, GATE_Y, 0);
+				grid->addObject(id_cus++, cus);
+				downHang0();
+				CScene::cusHang0Up();
+			}
+			else if (res == 1 && getHang1() > 0) {
+				CGhost* cus = new CGhost(GATE_X, GATE_Y, 1);
+				grid->addObject(id_cus++, cus);		
+				downHang1();				
+				CScene::cusHang1Up();
+			}
+			else {
+				CGhost* cus = new CGhost(GATE_X, GATE_Y, 2);
+				grid->addObject(id_cus++, cus);
+				downHang2();
+				CScene::cusHang2Up();
 			}
 		}
 	}
-
-	for each (LPGAMEOBJECT var in smallballs)
+	grid->GetListObject(objects, 0, 0);
+	for (int i = 0; i < objects.size(); i++)
 	{
-		var->Update(dt);
+		coObjects.push_back(objects[i]);
 	}
-
-	game->GetCamPos(cam_x, cam_y);
-
-	if (isAutoTran)
-	{
-		
-		if (cam_x < auto_tran)
-		{
-			if (cam_x < auto_tran - SCREEN_WIDTH / 2)
-				game->SetCamPos(cam_x + 2.0f, cam_y);// vận tốc chuyển màn 2.0f pixcel / milisecond 
-			else
-			{
-			
-					game->SetCamPos(cam_x + 2.0f, cam_y);// vận tốc chuyển màn 2.0f pixcel / milisecond 
-			}
-
-		}
-		else
-		{
-			_stage++;
-			id = GetStartScene();
-			isAutoTran = false;
-			
-			CGate::Stop();
-		}
-	}
-	else
-	{
-		if (id == 5)
-		{
-			Sound::GetInstance()->Stop(eSound::musicStage1);
-			Sound::GetInstance()->Play(eSound::music_Boss);
-		}
-		float cx, cy;
-		game->GetCamPos(cam_x, cam_y);
-		grid->GetListObject(objects, cam_x, cam_y);
 
 		
 		// Update camera to follow simon
-		cx = SCREEN_WIDTH / 2 - 40;
 		//cy -= SCREEN_HEIGHT / 2 + 40;
-
-		vector<LPGAMEOBJECT> coObjects;
-		for (int i = 0; i < objects.size(); i++)
-		{
-			coObjects.push_back(objects[i]);
-		}
-
 		for (int i = 0; i < objects.size(); i++)
 		{
 			objects[i]->Update(dt, &coObjects);
 		}
-
-
-		if (cx < GetLeft())
-			cx = GetLeft();
-		if (id != 4)
-		{
-			if (cx > GetRight() - SCREEN_WIDTH)
-				cx = GetRight() - SCREEN_WIDTH;
-		}
-
-		coObjects.clear();
-
-	}
-
+		
 }
 void CScene::Render() 
 {
 	CSprites::GetInstance()->Get(1000000)->Draw(0, 0);
 
-	for each (LPGAMEOBJECT var in smallballs)
-	{
-		var->Render();
-	}
 
 	for (int i = 0; i < objects.size(); i++)
 	{
@@ -269,7 +273,6 @@ void CScene::TranScene()
 }
 void CScene::AddSmallBall(LPGAMEOBJECT smallball)
 {
-	smallballs.push_back(smallball);
 }
 
 void CScene::UpStage()

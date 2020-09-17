@@ -37,10 +37,19 @@
 //#include "Sound.h"
 
 #define TIME_KILL_ALL_ENEMY 1000
+#define GATE_X 475 
+#define GATE_Y 750
+
 
 class CScene
 {
 	static CScene* __instance;
+	int __hang0;
+	int __hang1;
+	int __hang2;
+	static int cus_hang0;
+	static int cus_hang1;
+	static int cus_hang2;
 	CBoss* boss;
 	CMap* map;
 	CDagger* dagger;
@@ -53,7 +62,7 @@ class CScene
 	//Sound* sound;
 	CSprites* sprites;
 	vector<LPGAMEOBJECT> objects;
-	vector<LPGAMEOBJECT> smallballs;
+	vector<LPGAMEOBJECT> hide_gate;
 	int id;
 	int _stage;
 	bool isAutoTran;
@@ -62,8 +71,26 @@ class CScene
 	float cam_x;
 	float cam_y;
 	bool isOutSide;
+	vector<LPGAMEOBJECT> coObjects;
+	int id_cus;
+
 public:
 	static CScene* GetInstance();
+	static int cusHang0Up();
+	static int cusHang1Up();
+	static int cusHang2Up();
+	static int cusHang0Down();
+	static int cusHang1Down();
+	static int cusHang2Down();
+	void setHang0(int n);
+	void setHang1(int n);
+	void setHang2(int n);	
+	int getHang0();
+	int getHang1();
+	int getHang2();
+	int downHang0();
+	int downHang1();
+	int downHang2();
 	CScene(int id = 0);
 	void LoadResoure();
 	void Update(DWORD dt);

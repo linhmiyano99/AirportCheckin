@@ -35,7 +35,7 @@ CTorch::CTorch(float _x, float _y, int id, int type) : CGameObject(_x, _y, type)
 	}
 	AddAnimation(800); // fire
 	AddAnimation(802); // bright
-
+		
 	switch (id)
 	{
 	case ID_WHIPUPGRADE:
