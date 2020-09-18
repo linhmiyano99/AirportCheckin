@@ -4,7 +4,7 @@
 
 bool CGhost::isStart = false;
 
-CGhost::CGhost(float _x, float _y, int id) :CEnemy(_x, _y, id, eType::GHOST)
+CGhost::CGhost(float _x, float _y, int id, int hang_checkin ) :CEnemy(_x, _y, id, eType::GHOST)
 {
 	animations.clear();
 	AddAnimation(1300);
@@ -17,7 +17,7 @@ CGhost::CGhost(float _x, float _y, int id) :CEnemy(_x, _y, id, eType::GHOST)
 	SetSpeed(0, 0);
 	dt_appear = 0;
 	hang = id;
-	hang_checkin = id;
+	this->hang_checkin = hang_checkin;
 	vx = 1;
 }
 void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -33,21 +33,8 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			x = GATE_X;
 			y = GATE_Y;
 			dt_check_in = 0;
-			switch (hang)
-			{
-			case 0:
-				CScene::cusHang0Down();
-				return;
-			case 1:
-				CScene::cusHang1Down();
-				return;
-			case 2:
-				CScene::cusHang2Down();
-
-				return;
-			default:
-				return;
-			}
+			CScene::downGate(hang_checkin);
+			hang_checkin = -1;
 		}
 		return;
 	}
@@ -105,7 +92,6 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					{
 						CHidenObject* ohiden = dynamic_cast<CHidenObject*>(e->obj);
 						dt_appear = GetTickCount();
-						dt_check_in = 5000;
 						switch (ohiden->GetState()) {
 							case eType::OBJECT_HIDDEN_GATE_0:
 								dt_check_in = 1000 * (2 + rand() % 2);
@@ -184,7 +170,7 @@ void CGhost::GetBoundingBox(float& left, float& top, float& right, float& bottom
 }
 
 
-void CGhost::SetHang(int hang) {
+void CGhost::SetHang(int hang, int hang_checkin) {
 	this->hang = hang;
-	this->hang_checkin = hang;
+	this->hang_checkin = hang_checkin;
 }

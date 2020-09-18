@@ -15,9 +15,6 @@
 #include "Define.h"
 
 #include "Camera.h"
-
-#include "Simon.h"
-#include "Map.h"
 #include "HidenObject.h"
 
 
@@ -32,10 +29,9 @@ class CScene
 	int __hang0;
 	int __hang1;
 	int __hang2;
-	static int cus_hang0;
-	static int cus_hang1;
-	static int cus_hang2;
-	CMap* map;
+	static int gate0;
+	static int gate1;
+	static int gate2;
 	CGame* game;
 	CHidenObject* hiden;
 	//Sound* sound;
@@ -54,16 +50,7 @@ class CScene
 
 public:
 	static CScene* GetInstance();
-	static int cusHang0Up();
-	static int cusHang1Up();
-	static int cusHang2Up();
-	static int cusHang0Down();
-	static int cusHang1Down();
-	static int cusHang2Down();
-	void setHang0(int n);
-	void setHang1(int n);
-	void setHang2(int n);
-	bool getFirst(int hang);
+	bool getFirst(int hang, int hang_checkin);
 	CScene(int id = 0);
 	void LoadResoure();
 	void Update(DWORD dt);
@@ -71,9 +58,49 @@ public:
 	void SetMap(int id = 0);
 	int GetScene() { return id; }
 	vector<LPGAMEOBJECT> GetObjects() { return objects; }
-	int GetLeft();
-	int GetTop();
-	int GetRight();
-	int GetBottom();
+	static int getGate(int gate) {
+		switch (gate) {
+		case 0:
+			return gate0;
+		case 1:
+			return gate1;
+		case 2:
+			return gate2;
+		}
+	}
+	static int upGate(int gate) {
+		switch (gate) {
+		case 0:
+			return ++gate0;
+		case 1:
+			return ++gate1;
+		case 2:
+			return ++gate2;
+		}
+	}
+	static int downGate(int gate) {
+		switch (gate) {
+		case 0:
+			return --gate0;
+		case 1:
+			return --gate1;
+		case 2:
+			return --gate2;
+		}
+	}
+	int getGateNull(int gate);
+	void nullGate(int gate) {
+		switch (gate) {
+		case 0:
+			gate0 = 0;
+			break;
+		case 1:
+			gate1 = 0;
+			break;
+		case 2:
+			gate2 = 0;
+			break;
+		}
+	}
 };
 #endif // !__SMALLBALL_H__
