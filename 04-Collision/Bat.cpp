@@ -23,8 +23,6 @@ void CBat::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		return;
 	float c_x, c_y;
 	CGame::GetInstance()->GetCamPos(c_x, c_y);
-	if (CScene::GetInstance()->IsKillAllEnemy() && x > c_x && x < c_x + SCREEN_WIDTH)
-		Dead();
 
 	if (dt_die == 0)
 	{
@@ -88,8 +86,6 @@ void CBat::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 void CBat::Render()
 {
 	if (!CBat::IsStart())
-		return;
-	if (CScene::GetInstance()->IsTranScene())
 		return;
 	if (state == TORCH_STATE_EXSIST)
 	{

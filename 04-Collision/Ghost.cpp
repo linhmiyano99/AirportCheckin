@@ -1,7 +1,6 @@
 ﻿#include"Ghost.h"
 #include"Scene.h"
 #include"HidenObject.h"
-#include"Torch.h"
 
 bool CGhost::isStart = false;
 
@@ -29,40 +28,51 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		if (GetTickCount() - dt_appear > dt_check_in) {
 			Dead();
-			if (hang == 0) {
+			dt_appear = 0;
+			vx = vy = 0;
+			x = GATE_X;
+			y = GATE_Y;
+			dt_check_in = 0;
+			switch (hang)
+			{
+			case 0:
 				CScene::cusHang0Down();
-			}
-			else if (hang == 1)
-			{
+				return;
+			case 1:
 				CScene::cusHang1Down();
-			}
-			else if (hang == 2)
-			{
+				return;
+			case 2:
 				CScene::cusHang2Down();
+
+				return;
+			default:
+				return;
 			}
 		}
 		return;
 	}
-	if (hang_checkin == 0)
+	switch (hang_checkin)
 	{
-		if (x > CHECKIN_0)
-			vx = -0.005f * dt;
-		else vx = 0;
-	}
-	else if (hang_checkin == 2) {
-		if (x < CHECKIN_2)
-			vx = 0.005f * dt;
-		else
+		case 0:
+			if (x > CHECKIN_0)
+				vx = -0.005f * dt;
+			else vx = 0;
+			break;
+		case 2:
+			if (x < CHECKIN_2)
+				vx = 0.005f * dt;
+			else
+				vx = 0;
+			break;
+		default:
 			vx = 0;
+			break;
 	}
-	else
-		vx = 0;
 	if (dt_die == 0)
 	{
 		if (state == TORCH_STATE_EXSIST)
 		{
 			float _x, _y;
-			CSimon::GetInstance()->GetPosition(_x, _y);
 			vy = -GHOST_SPEED * dt;
 			this->dt = dt;
 			dx = vx * dt;
@@ -93,12 +103,28 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					LPCOLLISIONEVENT e = coEventsResult[i];
 					if (dynamic_cast<CHidenObject*>(e->obj))
 					{
-						CollisionWithHiden(dt, e->obj, min_tx, min_ty, nx, ny_1);
+						CHidenObject* ohiden = dynamic_cast<CHidenObject*>(e->obj);
+						dt_appear = GetTickCount();
+						dt_check_in = 5000;
+						switch (ohiden->GetState()) {
+							case eType::OBJECT_HIDDEN_GATE_0:
+								dt_check_in = 1000 * (2 + rand() % 2);
+							break;
+							case eType::OBJECT_HIDDEN_GATE_1:
+								dt_check_in = 1000 * (1 + rand() % 4);
+							break;
+							case eType::OBJECT_HIDDEN_GATE_2:
+							dt_check_in = 1000 * (3 + rand() % 5);
+							break;
+						}
+						vx = vy = 0;
+						ohiden = NULL;
 					}
 					else {
 						//y += min_ty * dy + ny * 0.4f;
 						vy = 0;
-						y += 0.4f;
+						vx = 0;
+						y += 0.004f;
 					}
 
 				}
@@ -114,8 +140,6 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 void CGhost::Render()
 {
 	if (!CGhost::IsStart())
-		return;
-	if (CScene::GetInstance()->IsTranScene())
 		return;
 	if (x == 0 && y == 0)
 		return;
@@ -144,21 +168,6 @@ void CGhost::Render()
 		}
 
 	}
-	else if (state == TORCH_STATE_ITEM)
-	{
-		if (item != NULL)
-			item->Render();
-
-	}
-	else
-	{
-		if (GetTickCount() - dt_die < TIME_ENEMY_DIE)
-		{
-			animations[1]->Render(x, y);
-			if (animations[1]->GetCurrentFrame() > 0)
-				animations[2]->Render(x - 2, y - 5);
-		}
-	}
 
 	RenderBoundingBox();
 }
@@ -172,73 +181,10 @@ void CGhost::GetBoundingBox(float& left, float& top, float& right, float& bottom
 		right = x + GHOST_BBOX_WIDTH;
 		bottom = y + GHOST_BBOX_HEIGHT;
 	}
-	else if (state == TORCH_STATE_ITEM)
-	{
-		item->GetBoundingBox(left, top, right, bottom);
-	}
-}
-void CGhost::CollisionWithBrick(DWORD dt, LPGAMEOBJECT& obj, float min_tx0, float min_ty0, int nx0, int ny0)
-{
-
-	vector<LPCOLLISIONEVENT> coEvents;
-	vector<LPCOLLISIONEVENT> coEventsResult;
-
-	coEvents.clear();
-	vector<LPGAMEOBJECT> list;
-	list.push_back((LPGAMEOBJECT)(obj));
-	// turn off collision when die 
-
-	CalcPotentialCollisions(&list, coEvents);
-
-	float min_tx, min_ty, nx = 0, ny;
-
-	FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny);
-
-	//// block 
-	
-	list.clear();
 }
 
-void CGhost::CollisionWithHiden(DWORD dt, LPGAMEOBJECT& obj, float min_tx0, float min_ty0, int nx0, int ny0)
-{
-	vector<LPCOLLISIONEVENT> coEvents;
-	vector<LPCOLLISIONEVENT> coEventsResult;
 
-	coEvents.clear();
-
-	vector<LPGAMEOBJECT> list;
-	list.push_back((LPGAMEOBJECT)(obj));
-	// turn off collision when die 
-
-	CalcPotentialCollisions(&list, coEvents);
-
-	float min_tx, min_ty, nx = 0, ny;
-
-	FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny);
-
-	//// block 
-
-	// clean up collision events
-	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
-	CHidenObject* ohiden = dynamic_cast<CHidenObject*>(obj);
-	dt_appear = GetTickCount();
-	if (ohiden->GetState() == eType::OBJECT_HIDDEN_GATE_0)
-	{
-		dt_check_in = 1000 * (2 + rand() % 2);
-	
-	}
-	else if (ohiden->GetState() == eType::OBJECT_HIDDEN_GATE_1)
-	{
-		dt_check_in = 1000 * (1 + rand() % 4);
-
-	}
-	else if (ohiden->GetState() == eType::OBJECT_HIDDEN_GATE_2)
-	{
-		dt_check_in = 1000 * (3 + rand() % 5);
-
-	}
-
-
-	ohiden = NULL;
-	list.clear();
+void CGhost::SetHang(int hang) {
+	this->hang = hang;
+	this->hang_checkin = hang;
 }

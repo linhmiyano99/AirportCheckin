@@ -2,7 +2,7 @@
 #include "Enemy.h"
 
 #define GHOST_BBOX_WIDTH 40
-#define GHOST_BBOX_HEIGHT 30
+#define GHOST_BBOX_HEIGHT 10
 
 #define GHOST_SPEED 0.003f
 #define GHOST_GRAVITY -0.05f
@@ -30,7 +30,6 @@ public:
 	static void Start() { isStart = true; }
 	static void Stop() { isStart = false; }
 	static bool IsStart() { return isStart; }
-	void CollisionWithBrick(DWORD dt, LPGAMEOBJECT& listBrick, float min_tx0, float min_ty0, int nx0, int ny0);
-	void CollisionWithHiden(DWORD dt, LPGAMEOBJECT& listBrick, float min_tx0, float min_ty0, int nx0, int ny0);
+	void SetHang(int hang);
 	
 };

@@ -8,24 +8,6 @@
 #include "Simon.h"
 #include "Textures.h"
 
-//item
-#include "WhipUpgrade.h"
-#include "ItemDagger.h"
-#include "ItemHeart.h"
-#include "SmallHeart.h"
-#include "Define.h"
-#include "ItemChicken.h"
-#include "Money.h"
-#include "ItemBossBall.h"
-#include "ItemAxe.h"
-#include "ItemII.h"
-#include "ItemBoongmerang.h"
-#include "ItemClock.h"
-#include "ItemCross.h"
-#include "ItemHollyWatter.h"
-#include "ItemIII.h"
-#include "ItemVase.h"
-
 
 #define TORCH_WIDTH 32
 #define TORCH_HEIGHT 64

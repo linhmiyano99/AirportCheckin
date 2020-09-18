@@ -35,68 +35,6 @@ CTorch::CTorch(float _x, float _y, int id, int type) : CGameObject(_x, _y, type)
 	}
 	AddAnimation(800); // fire
 	AddAnimation(802); // bright
-		
-	switch (id)
-	{
-	case ID_WHIPUPGRADE:
-		item = new CWhipUpgrade(_x,_y);
-		break;
-	case ID_DAGGER:
-		item = new CItemDagger(_x,_y);
-		break;
-	case ID_HEART:
-		item = new CItemHeart(_x, _y);
-		break;
-	case ID_SMALLHEART:
-		item = new CSmallHeart(_x, _y);
-		break;
-	case ID_CHICKEN:
-		item = new CItemChicken(_x, _y);
-		break;
-	case ID_MONEY_1:
-		item = new CItemMoney(_x, _y, eType::MONEY_1);
-		break;
-	case ID_MONEY_2:
-		item = new CItemMoney(_x, _y, eType::MONEY_2);
-		break;
-	case ID_MONEY_3:
-		item = new CItemMoney(_x, _y, eType::MONEY_3);
-		break;
-	case ID_MONEY_4:
-		item = new CItemMoney(_x, _y, eType::MONEY_4);
-		break;
-	case ID_BOSSBALL:
-		item = new CItemBossBall(_x, _y);
-		break;
-	case ID_AXE:
-		item = new CItemAxe(_x, _y);
-		break;
-	case ID_II:
-		item = new CItemII(_x, _y);
-		break;
-	case ID_CLOCK:
-		item = new CItemClock(_x, _y);
-		break;
-	case ID_CROSS:
-		item = new CItemCross(_x, _y);
-		break;
-	case ID_HOLLYWATTER:
-		item = new CItemHollyWatter(_x, _y);
-		break;
-	case ID_BOONGMERANG:
-		item = new CItemBoongmerang(_x, _y);
-		break;
-	case ID_VASE:
-		item = new CItemVase(_x, _y);
-		break;
-	case ID_III:
-		item = new CItemIII(_x, _y);
-		break;
-
-	default:
-		item = NULL;
-		break;
-	}
 
 	x = _x;
 	y = _y;

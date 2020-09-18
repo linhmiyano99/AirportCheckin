@@ -342,9 +342,6 @@ bool CGame::isCollision(RECT r1, RECT r2)
 }
 void CGame::SetCamPos(float x, float y)
 {
-	if (x < CScene::GetInstance()->GetMapRight() - SCREEN_WIDTH)
-	{
-		cam_x= x;
-	}
-	cam_y = y;
+	cam_x = 0;
+	cam_y = 0;
 }

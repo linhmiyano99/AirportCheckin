@@ -94,7 +94,6 @@ void CBoss::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					smallball->SetSpeed(SMALLBALL_SPEED * nx,
 						1.0 * (s_y - y - BOSS_BBOX_WIDTH / 2) / (s_x - x - BOSS_BBOX_HEIGHT / 2) * nx * SMALLBALL_SPEED);
 				}
-				CScene::GetInstance()->AddSmallBall(smallball);
 				return;
 			}
 			if (state == BOSS_STATE_ATTACK)
