@@ -123,6 +123,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Board.h" />
+    <ClInclude Include="Code.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="DSutil.h" />
@@ -144,6 +146,8 @@
     <ClInclude Include="XML\tinyxml.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Code.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="Define.cpp" />
     <ClCompile Include="DSutil.cpp" />

@@ -97,6 +97,8 @@ public:
 	virtual void Hurt() { _energy -= 2; }
 	virtual void Go(){}
 	virtual void SetHang(int hang, int hang_checkin) {}
+	virtual void SetHang(int hang_checkin){}
+	virtual int getHang() { return 0; }
 	~CGameObject();
 };
 

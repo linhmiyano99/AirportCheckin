@@ -16,11 +16,12 @@
 
 #include "Camera.h"
 #include "HidenObject.h"
+#include "Board.h"
 
 
 #define TIME_KILL_ALL_ENEMY 1000
 #define GATE_X 475 
-#define GATE_Y 750
+#define GATE_Y 650
 
 
 class CScene
@@ -32,6 +33,13 @@ class CScene
 	static int gate0;
 	static int gate1;
 	static int gate2;
+	static int num_of_gate0;
+	static int num_of_gate1;
+	static int num_of_gate2;
+
+	static int time_of_gate0;
+	static int time_of_gate1;
+	static int time_of_gate2;
 	CGame* game;
 	CHidenObject* hiden;
 	//Sound* sound;
@@ -47,6 +55,8 @@ class CScene
 	bool isOutSide;
 	vector<LPGAMEOBJECT> coObjects;
 	int id_cus;
+	int check;
+	CBoard *board;
 
 public:
 	static CScene* GetInstance();
@@ -87,7 +97,66 @@ public:
 		case 2:
 			return --gate2;
 		}
+	}	
+	
+	static int upTimeGate(int gate) {
+		switch (gate) {
+		case 0:
+			DebugOut(L"\n[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx time 0] %d", CScene::getTimeGate(0));
+			return ++time_of_gate0;
+		case 1:
+			DebugOut(L"\n[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx time 1] %d", CScene::getTimeGate(1));
+			return ++time_of_gate1;
+		case 2:
+			DebugOut(L"\n[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx time 2] %d", CScene::getTimeGate(2));
+			return ++time_of_gate2;
+		}
+	}	
+	static int getTimeGate(int gate) {
+		switch (gate) {
+		case 0:
+			return time_of_gate0;
+		case 1:
+			return time_of_gate1;
+		case 2:
+			return time_of_gate2;
+		}
 	}
+	static int resetTimeGate(int gate) {
+		switch (gate) {
+		case 0:
+			time_of_gate0 = 0;
+			return time_of_gate0;
+		case 1:
+			time_of_gate1 = 0;
+			return time_of_gate1;
+		case 2:
+			time_of_gate2 = 0;
+			return time_of_gate2;
+		}
+	}
+	
+	static int upNumOfGate(int gate) {
+		switch (gate) {
+		case 0:
+			return ++num_of_gate0;
+		case 1:
+			return ++num_of_gate1;
+		case 2:
+			return ++num_of_gate2;
+		}
+	}
+	static int getNumOfGate(int gate) {
+		switch (gate) {
+		case 0:
+			return num_of_gate0;
+		case 1:
+			return num_of_gate1;
+		case 2:
+			return num_of_gate2;
+		}
+	}
+
 	int getGateNull(int gate);
 	void nullGate(int gate) {
 		switch (gate) {

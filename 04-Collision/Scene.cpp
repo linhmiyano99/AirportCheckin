@@ -17,6 +17,14 @@ int CScene::gate0 = 0;
 int CScene::gate1 = 0;
 int CScene::gate2 = 0;
 
+int CScene::num_of_gate0 = 0;
+int CScene::num_of_gate1 = 0;
+int CScene::num_of_gate2 = 0;
+
+int CScene::time_of_gate0 = 0;
+int CScene::time_of_gate1 = 0;
+int CScene::time_of_gate2 = 0;
+
 CScene::CScene(int id)
 {
 	this->id = id;
@@ -29,36 +37,40 @@ CScene::CScene(int id)
 	CManagementTexture* manage = new CManagementTexture();
 	SAFE_DELETE(manage);
 	CGhost::Start();
+	board = CBoard::GetInstance();
 	id_cus = 0;
-	__hang0 = 10;
-	__hang1 = 30;
-	__hang2 = 60;
+	__hang0 = 5;
+	__hang1 = 5;
+	__hang2 = 5;
+	check = 0;
 }
 
 
 void CScene::LoadResoure()
 {
 		CSprites::GetInstance()->Get(1000000)->Draw(0, 0);
-		CHidenObject* cus = new CHidenObject(225, 73, 400);
+		CHidenObject* cus = new CHidenObject(CHECKIN_0, 73, 400);
 		coObjects.push_back(cus);
-		cus = new CHidenObject(475, 73, 401);
+		cus = new CHidenObject(CHECKIN_1, 73, 401);
 		coObjects.push_back(cus);
-		cus = new CHidenObject(725, 73, 402);
+		cus = new CHidenObject(CHECKIN_2, 73, 402);
 		coObjects.push_back(cus);
 }
 
 void CScene::Update(DWORD dt)
 {
+	board->Update(dt);
 	if (__hang0 + __hang1 + __hang2 >0)
 	{
 		if (GetTickCount() % 1000 == 0) {
 			srand(time(NULL));
-			int res = rand() % 3;
+			int res = rand() % 10;
 			switch (res)
 			{
 				case 0:
 					if (__hang0 > 0) {
-						if (getFirst(0, 0) == false) {
+						if (!getFirst(0, 0)) 
+						{
 							CGhost* cus = new CGhost(GATE_X, GATE_Y, 0, getGateNull(0));
 							coObjects.push_back(cus);
 						}
@@ -66,20 +78,21 @@ void CScene::Update(DWORD dt)
 						break;
 					}
 				case 1:
+				case 2:
+				case 3:
 					if (__hang1 > 0) {
-						if (res == 1)
-						{
-							if (getFirst(1, 1) == false) {
+						
+							if (!getFirst(1, 1)) {
 								CGhost* cus = new CGhost(GATE_X, GATE_Y, 1, getGateNull(1));
 								coObjects.push_back(cus);
 							}
-						}
+						
 						__hang1--;
 						break;
 					}
 				default:
 					if (__hang2 > 0) {
-						if (getFirst(2, 2) == false) {
+						if (!getFirst(2, 2)) {
 							CGhost* cus = new CGhost(GATE_X, GATE_Y, 2, getGateNull(2));
 							coObjects.push_back(cus);
 						}
@@ -87,16 +100,16 @@ void CScene::Update(DWORD dt)
 						break;
 					}
 					if (__hang0 > 0) {
-						if (getFirst(0, 0) == false) {
-							CGhost* cus = new CGhost(GATE_X, GATE_Y, 0);
+						if (!getFirst(0, 0)) {
+							CGhost* cus = new CGhost(GATE_X, GATE_Y, getGateNull(0));
 							coObjects.push_back(cus);
 						}
 						__hang0--;
 						break;
 					}
 					if (__hang1 > 0) {
-						if (getFirst(1, 1) == false) {
-							CGhost* cus = new CGhost(GATE_X, GATE_Y, 1);
+						if (!getFirst(1, 1)) {
+							CGhost* cus = new CGhost(GATE_X, GATE_Y, getGateNull(1));
 							coObjects.push_back(cus);
 						}
 						__hang1--;
@@ -106,14 +119,57 @@ void CScene::Update(DWORD dt)
 			}
 
 		}
-
-	}
-	
 		for (int i = 0; i < coObjects.size(); i++)
 		{
-			if(coObjects[i]->GetState() == (TORCH_STATE_EXSIST))
-			coObjects[i]->Update(dt, &coObjects);
+			if (coObjects[i]->GetState() == (TORCH_STATE_EXSIST))
+			{
+				coObjects[i]->Update(dt, &coObjects);
+			}
 		}
+
+	}
+	else
+	{
+		if (check == 0 && getGate(0) == 0 && getGate(1) == 0) {
+			check = 1;
+			int temp = 0;
+			for (int i = 0; i < coObjects.size(); i++)
+			{
+				if (coObjects[i]->GetState() == (TORCH_STATE_EXSIST))
+				{
+					temp++;
+					if (temp > 3) {
+						switch (temp % 5)
+						{
+						case 0:
+							break;
+						case 1:
+						case 2:
+							coObjects[i]->SetHang(1);
+							break;
+						default:
+							coObjects[i]->SetHang(0);
+							break;
+						}
+					}
+				}
+
+			}
+
+		}
+		else{
+			for (int i = 0; i < coObjects.size(); i++)
+			{
+				if (coObjects[i]->GetState() == (TORCH_STATE_EXSIST))
+				{
+					coObjects[i]->Update(dt, &coObjects);
+					DebugOut(L"\n[Hang] %d", coObjects[i]->getHang());
+				}
+			}
+		}
+
+	}
+
 		
 }
 void CScene::Render() 
@@ -123,8 +179,12 @@ void CScene::Render()
 
 	for (int i = 0; i < coObjects.size(); i++)
 	{
-		coObjects[i]->Render();
+		if (coObjects[i]->GetState() == (TORCH_STATE_EXSIST))
+		{
+			coObjects[i]->Render();
+		}
 	}
+	board->Render();
 
 }
 void CScene::SetMap(int id)
@@ -135,21 +195,21 @@ void CScene::SetMap(int id)
 
 bool CScene::getFirst(int hang, int hang_checkin)
 {
-	for each (LPGAMEOBJECT obj in coObjects)
-	{
-		if (obj->GetState() != TORCH_STATE_EXSIST && !dynamic_cast<CHidenObject*>(obj)) {
-			obj->SetState(TORCH_STATE_EXSIST);
-			obj->SetHang(hang, getGateNull(hang_checkin));
-			return true;
-		}
-	}
 	return false;
+	//for (int i = 0; i < coObjects.size(); i++)
+	//{
+	//	if (coObjects[i]->GetState() != TORCH_STATE_EXSIST && !dynamic_cast<CHidenObject*>(coObjects[i])) {
+	//		coObjects[i]->SetState(TORCH_STATE_EXSIST);
+	//		hang_checkin = getGateNull(hang_checkin);
+	//		coObjects[i]->SetHang(hang, hang_checkin);
+	//		return true;
+	//	}
+	//}
+	//return false;
 }
 
 int CScene::getGateNull(int gate) {
-	DebugOut(L"\n[getGateNull]  %d", getGate(0));
-	DebugOut(L"\n[getGateNull]  %d", getGate(1));
-	DebugOut(L"\n[getGateNull] %d", getGate(2));
+	
 	if (getGate(gate) > 3) {
 		if (getGate(0) == 0)
 		{
@@ -199,6 +259,7 @@ int CScene::getGateNull(int gate) {
 					return 0;
 				}
 			}
+		
 		}
 	}
 	upGate(gate);

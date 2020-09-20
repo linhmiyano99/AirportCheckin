@@ -101,6 +101,12 @@
     <ClInclude Include="Sound.h">
       <Filter>framework\Sound</Filter>
     </ClInclude>
+    <ClInclude Include="Board.h">
+      <Filter>framework\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Code.h">
+      <Filter>framework\GameObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="debug.cpp">
@@ -168,6 +174,12 @@
     </ClCompile>
     <ClCompile Include="Define.cpp">
       <Filter>framework\Define</Filter>
+    </ClCompile>
+    <ClCompile Include="Board.cpp">
+      <Filter>framework\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Code.cpp">
+      <Filter>framework\GameObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

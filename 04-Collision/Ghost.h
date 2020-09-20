@@ -9,8 +9,8 @@
 
 #define GHOST_DISTANCE_TOO_FAR 300
 
-#define CHECKIN_0 225
-#define CHECKIN_1 475
+#define CHECKIN_0 325
+#define CHECKIN_1 525
 #define CHECKIN_2 725
 
 
@@ -31,5 +31,8 @@ public:
 	static void Stop() { isStart = false; }
 	static bool IsStart() { return isStart; }
 	void SetHang(int hang, int hang_checkin);
+	void SetHang(int hang_checkin);
+	 int getHang() { return hang_checkin; }
+
 	
 };

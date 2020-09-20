@@ -23,7 +23,7 @@ public:
 	static CBoard* GetInstance();
 	CBoard()
 	{
-		_time = 300;
+		_time = 0;
 		//_weapon = eType::DAGGER;
 		_count = GetTickCount();
 		isStop = false;

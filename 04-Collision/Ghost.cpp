@@ -34,7 +34,16 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			y = GATE_Y;
 			dt_check_in = 0;
 			CScene::downGate(hang_checkin);
+			CScene::upNumOfGate(hang_checkin);
+			CScene::resetTimeGate(hang_checkin);
 			hang_checkin = -1;
+		}
+		else 
+		{
+			if (GetTickCount() - dt_appear > 1000 * CScene::getTimeGate(hang_checkin))
+			{
+				CScene::upTimeGate(hang_checkin);
+			}
 		}
 		return;
 	}
@@ -42,17 +51,41 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		case 0:
 			if (x > CHECKIN_0)
+			{
 				vx = -0.005f * dt;
+				vy = 0;
+			}
 			else vx = 0;
 			break;
 		case 2:
 			if (x < CHECKIN_2)
+			{
 				vx = 0.005f * dt;
+				vy = 0;
+			}
 			else
 				vx = 0;
 			break;
 		default:
-			vx = 0;
+			if (vx < 0 && x < CHECKIN_1 + 1 || vx > 0 && x > CHECKIN_1 - 1)
+			{
+				vx = 0;
+				vy = 0;
+			}
+			else if (x > CHECKIN_1 + 1 && vx <= 0)
+			{
+				vx = -0.005f * dt;
+				vy = 0;
+			}
+			else if (x < CHECKIN_1 - 1 && vx >= 0)
+			{
+				vx = 0.005f * dt;
+				vy = 0;
+			}
+			else {
+				vx = 0;
+				vy = 0;
+			}
 			break;
 	}
 	if (dt_die == 0)
@@ -60,10 +93,21 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (state == TORCH_STATE_EXSIST)
 		{
 			float _x, _y;
-			vy = -GHOST_SPEED * dt;
-			this->dt = dt;
-			dx = vx * dt;
-			dy = vy * dt;
+			if (vx == 0) {
+				vy = -GHOST_SPEED * dt;
+				this->dt = dt;
+				dx = 0;
+				dy = vy * dt;
+			}
+			else {
+				vy = 0;
+				this->dt = dt;
+				dx = vx * dt;
+				dy = vy * dt;
+				x += dx;
+				return;
+			}
+			
 
 			// Simple fall down
 			vector<LPCOLLISIONEVENT> coEvents;
@@ -110,7 +154,7 @@ void CGhost::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						//y += min_ty * dy + ny * 0.4f;
 						vy = 0;
 						vx = 0;
-						y += 0.004f;
+						y += 0.4f;
 					}
 
 				}
@@ -133,21 +177,21 @@ void CGhost::Render()
 	{
 		if (hang == 0)
 		{
-			if(vy != 0)
+			if(vy != 0 || vx != 0)
 				animations[0]->Render(x, y, nx, 255);
 			else
 				animations[3]->Render(x, y, nx, 255);
 		}
 		else if(hang == 1)
 		{
-			if (vy != 0)
+			if (vy != 0 || vx != 0)
 				animations[1]->Render(x, y, nx, 255);
 			else
 				animations[4]->Render(x, y, nx, 255);
 		}
 		else
 		{
-			if (vy != 0)
+			if (vy != 0 || vx != 0)
 				animations[2]->Render(x, y, nx, 255);
 			else
 				animations[5]->Render(x, y, nx, 255);
@@ -155,7 +199,7 @@ void CGhost::Render()
 
 	}
 
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
 void CGhost::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
@@ -173,4 +217,11 @@ void CGhost::GetBoundingBox(float& left, float& top, float& right, float& bottom
 void CGhost::SetHang(int hang, int hang_checkin) {
 	this->hang = hang;
 	this->hang_checkin = hang_checkin;
+}
+
+
+void CGhost::SetHang(int hang_checkin) {
+	this->hang_checkin = hang_checkin;
+	vy = 0;
+	vx = -0.005f;
 }
