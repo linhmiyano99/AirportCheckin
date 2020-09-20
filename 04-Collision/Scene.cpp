@@ -39,9 +39,9 @@ CScene::CScene(int id)
 	CGhost::Start();
 	board = CBoard::GetInstance();
 	id_cus = 0;
-	__hang0 = 5;
-	__hang1 = 5;
-	__hang2 = 5;
+	__hang0 = 20;
+	__hang1 = 60;
+	__hang2 = 120;
 	check = 0;
 }
 
@@ -145,9 +145,13 @@ void CScene::Update(DWORD dt)
 							break;
 						case 1:
 						case 2:
+							CScene::downGate(coObjects[i]->getHang());
+							CScene::upGate(1);
 							coObjects[i]->SetHang(1);
 							break;
 						default:
+							CScene::downGate(coObjects[i]->getHang());
+							CScene::upGate(0);
 							coObjects[i]->SetHang(0);
 							break;
 						}
