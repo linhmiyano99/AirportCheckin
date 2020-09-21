@@ -39,9 +39,9 @@ CScene::CScene(int id)
 	CGhost::Start();
 	board = CBoard::GetInstance();
 	id_cus = 0;
-	__hang0 = 20;
-	__hang1 = 60;
-	__hang2 = 120;
+	__hang0 = 10;
+	__hang1 = 30;
+	__hang2 = 60;
 	check = 0;
 }
 
@@ -214,7 +214,7 @@ bool CScene::getFirst(int hang, int hang_checkin)
 
 int CScene::getGateNull(int gate) {
 	
-	if (getGate(gate) > 3) {
+	if (getGate(gate) > 0) {
 		if (getGate(0) == 0)
 		{
 			upGate(0);
